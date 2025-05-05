@@ -57,7 +57,7 @@ def continuation(text=None, contents=None, instruction=None, recorder=None, **kw
         'response_format':          kwargs.get('response_format',{'type': 'text'}),
         'temperature':              kwargs.get('temperature', 1),  # 0.0 to 2.0
         'max_tokens':               kwargs.get('max_tokens', 4096),
-        'prompt_truncate_length':   kwargs.get('prompt_truncate_length', 1000000),
+        # 'prompt_truncate_length':   kwargs.get('prompt_truncate_length', 1000000),
         'n':                        kwargs.get('n', 1),
         'top_p':                    kwargs.get('top_p', 0.9),
         'top_k':                    kwargs.get('top_k', 10),

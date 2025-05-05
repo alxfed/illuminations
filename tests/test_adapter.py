@@ -9,6 +9,52 @@ import pytest
 from src.illuminations.adapter import decode, encode
 
 
+SINGLE_OUTPUT = {
+    'id': 'b205b1ab-79e7-4f85-b822-919ca1b1d886',
+    'object': 'chat.completion',
+    'created': 1746469042,
+    'model': 'accounts/fireworks/models/deepseek-v3-0324',
+    'choices': [
+        {'index': 0,
+         'message': {
+             'role': 'assistant',
+             'content': 'Ah! That sounds like the opening of one of those old, whimsical folktales where the world was topsy-turvy and animals did all sorts of peculiar things. '},
+         'finish_reason': 'stop'
+         }
+    ],
+    'usage': {'prompt_tokens': 21, 'total_tokens': 604, 'completion_tokens': 583}
+}
+
+
+MULTIPLE_OUTPUTS = {
+    'id': 'a33d247b-18b9-4141-92ac-68b0247689cb',
+    'object': 'chat.completion',
+    'created': 1746469566,
+    'model': 'accounts/fireworks/models/deepseek-v3-0324',
+    'choices': [
+        {
+            'index': 0,
+            'message':
+                {
+                    'role': 'assistant',
+                    'content': 'Ah! That sounds like the opening of one of those old, whimsical folktales where the world was topsy-turvy and animals did all sorts of peculiar things. '
+                },
+            'finish_reason': 'stop'
+        },
+        {
+            'index': 1,
+            'message':
+                {
+                    'role': 'assistant',
+                    'content': 'Ah! That sounds like the opening of an old folk tale or nursery rhyme. '
+                },
+            'finish_reason': 'stop'
+        }
+    ],
+    'usage': {'prompt_tokens': 21, 'total_tokens': 461, 'completion_tokens': 440}
+}
+
+
 @pytest.fixture(scope="session")
 def user_said():
     message = {
