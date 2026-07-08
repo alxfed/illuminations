@@ -100,6 +100,8 @@ def respond(messages=None, instructions=None, tools=None, **kwargs):
     # Tools if there are some
     if tools:
         payload['tools'] = tools
+        payload['parallel_tool_calls'] = True
+        payload['max_tool_calls'] = kwargs.get("max_tool_calls", None)
         payload['tool_choice'] = 'auto'
 
     while True:
