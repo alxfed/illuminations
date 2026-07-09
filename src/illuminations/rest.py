@@ -52,10 +52,8 @@ def query(payload):
         # Execute the request
         with urllib.request.urlopen(req, timeout=3000) as response:
             response_data = response.read().decode('utf-8')
-            response_json = json.loads(response_data)
-            id = response_json['id']
-            output = response_json['choices'][0]['message']
-        return id, output
+            output = json.loads(response_data)
+        return output
 
     except urllib.error.HTTPError as e:
         # Handle HTTP errors (e.g., 401 Unauthorized, 400 Bad Request)
@@ -129,16 +127,18 @@ def continuation(text=None, contents=None, instruction=None, tools=None, recorde
         payload['tool_choice'] = 'auto'
 
     while True:
-        response_id, result = query(payload)
-        thoughts, text, function_calls = decode_output(result)
+        result = query(payload)
+        completion_message = result['choices'][0]['message']
+        instruction_and_contents.append(completion_message)
+        thoughts, text, function_calls = decode_output(completion_message)
 
         if function_calls:
-            function_outputs_messages = []
+            # Call all requested functions and create response messages.
             for function_call in function_calls:
                 call_id = function_call.get('id')
-                func_def = function_call.get('function')
-                func_name = func_def.get('name')
-                func_args_str = func_def.get('arguments', '{}')
+                func = function_call.get('function')
+                func_name = func.get('name')
+                func_args_str = func.get('arguments', '{}')
                 try:
                     if isinstance(func_args_str, str):
                         func_args = json.loads(func_args_str)
@@ -149,23 +149,15 @@ def continuation(text=None, contents=None, instruction=None, tools=None, recorde
                     print(f"Error parsing tool arguments for {func_name}: {e}")
 
                 # Look up tool by name in globals and caller frames
-                func = globals().get(func_name)
-                if not func:
-                    import inspect
-                    frame = inspect.currentframe().f_back
-                    while frame:
-                        if func_name in frame.f_globals:
-                            func = frame.f_globals[func_name]
-                            break
-                        frame = frame.f_back
+                func = get_function(func_name)
 
                 if func and callable(func):
                     try:
-                        tool_result = func(**func_args)
-                        if isinstance(tool_result, (dict, list)):
-                            result = json.dumps(tool_result)
+                        function_result = func(**func_args)
+                        if isinstance(function_result, (dict, list)):
+                            result = json.dumps(function_result)
                         else:
-                            result = str(tool_result)
+                            result = str(function_result)
                     except Exception as e:
                         result = f"Error executing tool {func_name}: {str(e)}"
                         print(result)
@@ -174,16 +166,11 @@ def continuation(text=None, contents=None, instruction=None, tools=None, recorde
                     print(result)
 
                 tool_message = {
-                    "type": "function_call_output",
-                    "call_id": call_id,
-                    "output": result
+                    "role": "tool",
+                    "tool_call_id": call_id,
+                    "content": result
                 }
-                function_outputs_messages.append(tool_message)
-
-            # Now that all responses have been gathered
-            # we can change the payload and send them back
-            payload['previous_response_id'] = response_id
-            payload['input'] = function_outputs_messages
+                instruction_and_contents.append(tool_message)
         else:
             break
 
