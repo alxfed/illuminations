@@ -53,7 +53,7 @@ def query(payload):
         with urllib.request.urlopen(req, timeout=3000) as response:
             response_data = response.read().decode('utf-8')
             response_json = json.loads(response_data)
-            output = response_json['candidates'][0]['message']
+            output = response_json['choices'][0]['message']
         return output
 
     except urllib.error.HTTPError as e:
@@ -116,7 +116,7 @@ def continuation(text=None, contents=None, instruction=None, tools=None, recorde
     payload = {
         'model':                    kwargs.get('model', default_model),
         'messages':                 instruction_and_contents,
-        'response_format':          kwargs.get('response_format',{'type': 'text'}),
+        # 'response_format':          kwargs.get('response_format',{'type': 'text'}),
         'temperature':              kwargs.get('temperature', 1),  # 0.0 to 2.0
         'max_tokens':               kwargs.get('max_tokens', 4096),
         'prompt_truncate_len':      kwargs.get('prompt_truncate_len', 100000),
@@ -140,7 +140,7 @@ def continuation(text=None, contents=None, instruction=None, tools=None, recorde
         )
         if response.status_code == requests.codes.ok:
             response = response.json()
-            output = response['candidates'][0]['message']
+            output = response['choices'][0]['message']
             thoughts, text, function_calls = decode_output(output)
         else:
             print(f'Request status code: {response.status_code}')
