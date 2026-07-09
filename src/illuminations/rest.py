@@ -110,7 +110,10 @@ def continuation(text=None, contents=None, instruction=None, recorder=None, **kw
         'n':                        kwargs.get('n', 1),
         'top_p':                    kwargs.get('top_p', 0.9),
         'top_k':                    kwargs.get('top_k', 10),
-        # 'reasoning_effort':         kwargs.get('reasoning_effort', 'low'),  # 'low', 'medium', 'high'
+        'reasoning_effort':         kwargs.get('reasoning_effort', 'low'),  # 'low', 'medium', 'high'
+        'reasoning_history':        kwargs.get('reasoning_history', None),  # 'disabled', 'interleaved', 'preserved'
+        'tools':                    kwargs.get('tools', {}),
+        'parallel_tool_calls':      kwargs.get('parallel_tool_calls', True),
         'stream':                   False
     }
 
