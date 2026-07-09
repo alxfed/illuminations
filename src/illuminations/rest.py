@@ -53,8 +53,9 @@ def query(payload):
         with urllib.request.urlopen(req, timeout=3000) as response:
             response_data = response.read().decode('utf-8')
             response_json = json.loads(response_data)
+            id = response_json['id']
             output = response_json['choices'][0]['message']
-        return output
+        return id, output
 
     except urllib.error.HTTPError as e:
         # Handle HTTP errors (e.g., 401 Unauthorized, 400 Bad Request)
@@ -128,10 +129,8 @@ def continuation(text=None, contents=None, instruction=None, tools=None, recorde
         payload['tool_choice'] = 'auto'
 
     while True:
-        result = query(payload)
-        # id of the response
-        response_id = result['id']
-        thoughts, text, function_calls = decode_output(result.get('output', {}))
+        response_id, result = query(payload)
+        thoughts, text, function_calls = decode_output(result)
 
         if function_calls:
             function_outputs_messages = []
