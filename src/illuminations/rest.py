@@ -68,14 +68,6 @@ def query(payload):
         return {}
 
 
-def decode_output(output):
-    # Parse the result
-    text = output['content']
-    thoughts = output['reasoning_content']
-    function_calls = output['tool_calls']
-    return thoughts, text, function_calls
-
-
 def continuation(text=None, contents=None, instruction=None, tools=None, recorder=None, **kwargs):
     """A continuation of text with a given context and instruction.
         kwargs:
@@ -130,7 +122,9 @@ def continuation(text=None, contents=None, instruction=None, tools=None, recorde
         result = query(payload)
         completion_message = result['choices'][0]['message']
         instruction_and_contents.append(completion_message)
-        thoughts, text, function_calls = decode_output(completion_message)
+        thoughts = completion_message.get('reasoning_content', '')
+        text = completion_message.get('content', '')
+        function_calls = completion_message.get('tool_calls', [])
 
         if function_calls:
             # Call all requested functions and create response messages.
