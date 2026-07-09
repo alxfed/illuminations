@@ -135,9 +135,10 @@ def continuation(text=None, contents=None, instruction=None, tools=None, recorde
         if function_calls:
             function_outputs_messages = []
             for function_call in function_calls:
-                call_id = function_call.get('call_id')
-                func_name = function_call.get('name')
-                func_args_str = function_call.get('arguments', '{}')
+                call_id = function_call.get('id')
+                func_def = function_call.get('function')
+                func_name = func_def.get('name')
+                func_args_str = func_def.get('arguments', '{}')
                 try:
                     if isinstance(func_args_str, str):
                         func_args = json.loads(func_args_str)
