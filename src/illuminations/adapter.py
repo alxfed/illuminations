@@ -11,6 +11,8 @@ def decode(human_said, response, recorder=None):
     candidates = response['choices']
     if len(candidates) == 1:
         answer = candidates[0]['message']['content']
+        thoughts = candidates[0]['message']['reasoning_content']
+        function_calls = []
         if recorder:
             machine_answered = dict(role='assistant',
                                     content=answer)

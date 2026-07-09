@@ -10,7 +10,6 @@ import json
 import urllib.request
 import urllib.error
 import requests
-from .adapter import decode
 
 
 api_key                 = environ.get('FIREWORKS_API_KEY')
@@ -53,7 +52,8 @@ def query(payload):
         # Execute the request
         with urllib.request.urlopen(req, timeout=3000) as response:
             response_data = response.read().decode('utf-8')
-            output = json.loads(response_data)
+            response_json = json.loads(response_data)
+            output = response_json['candidates'][0]['message']
         return output
 
     except urllib.error.HTTPError as e:
@@ -69,7 +69,20 @@ def query(payload):
         return {}
 
 
-def continuation(text=None, contents=None, instruction=None, recorder=None, **kwargs):
+def decode_output(output):
+    # Parse the result
+    text = ''; thoughts = ''
+    for part in output:
+        part_type = part.get('type', None)
+        if part_type == 'message':
+            text = " ".join([chunk['text'] for chunk in part['content'] if chunk['type'] == 'output_text'])
+        elif part_type == 'reasoning':
+            thoughts = " ".join([chunk['text'] for chunk in part['summary'] if chunk['type'] == 'summary_text'])
+    function_calls = [part for part in output if part['type'] == 'function_call']
+    return thoughts, text, function_calls
+
+
+def continuation(text=None, contents=None, instruction=None, tools=None, recorder=None, **kwargs):
     """A continuation of text with a given context and instruction.
         kwargs:
             temperature     = 0 to 1.0
@@ -100,7 +113,7 @@ def continuation(text=None, contents=None, instruction=None, recorder=None, **kw
     first_message.extend(contents)
     instruction_and_contents = first_message
 
-    json_data = {
+    payload = {
         'model':                    kwargs.get('model', default_model),
         'messages':                 instruction_and_contents,
         'response_format':          kwargs.get('response_format',{'type': 'text'}),
@@ -112,29 +125,32 @@ def continuation(text=None, contents=None, instruction=None, recorder=None, **kw
         'top_k':                    kwargs.get('top_k', 10),
         'reasoning_effort':         kwargs.get('reasoning_effort', 'low'),  # 'low', 'medium', 'high'
         'reasoning_history':        kwargs.get('reasoning_history', None),  # 'disabled', 'interleaved', 'preserved'
-        'tools':                    kwargs.get('tools', {}),
-        'parallel_tool_calls':      kwargs.get('parallel_tool_calls', True),
         'stream':                   False
     }
+    if tools:
+        payload['tools'] = tools
+        payload['parallel_tool_calls'] = True
+        payload['tool_choice'] = 'auto'
 
     try:
         response = requests.post(
             url=f'{api_base}/chat/completions',
             headers=headers,
-            json=json_data,
+            json=payload,
         )
         if response.status_code == requests.codes.ok:
-            output = response.json()
-            answer = decode(human_says, output, recorder)
+            response = response.json()
+            output = response['candidates'][0]['message']
+            thoughts, text, function_calls = decode_output(output)
         else:
             print(f'Request status code: {response.status_code}')
-            return None
+            return '', ''
 
     except Exception as e:
         print(f'Unable to generate continuation of the text, {e}')
-        return None
+        return '', ''
 
-    return answer
+    return thoughts, text
 
 
 def completion(text, **kwargs):
