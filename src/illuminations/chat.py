@@ -5,7 +5,7 @@
 This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
-import utils
+import .utils
 
 
 def get_weather(location):
@@ -13,7 +13,7 @@ def get_weather(location):
     return {"temperature": "72F", "condition": "Sunny"}
 
 
-def chat(messages=None, instructions=None, tools=None, **kwargs):
+def chat_completion(messages=None, instructions=None, tools=None, **kwargs):
     """A continuation of text with a given context and instruction.
         kwargs:
             temperature     = 0 to 1.0
