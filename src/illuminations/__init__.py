@@ -15,11 +15,13 @@ from .utils import (query,
 from .chat import chat_complete
 from .completion import complete
 from .responses import respond
+from .messages import message
 
 __all__ = [
     "chat_complete",
     "complete",
     "respond",
+    "message",
     # The API calling
     "query",
     "headers",
