@@ -48,8 +48,11 @@ def complete(text, **kwargs):
     }
 
     responses = query(payload, '/completions')
+    response = responses['choices'][0]
+    text = response['text']
+    thoughts = ''
 
-    return responses
+    return thoughts, text
 
 
 if __name__ == '__main__':
