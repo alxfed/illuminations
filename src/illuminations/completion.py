@@ -9,7 +9,7 @@ from .utils import (default_model,
                     query)
 
 
-def completion(text, **kwargs):
+def complete(text, **kwargs):
     """A completions endpoint call through requests.
         kwargs:
             temperature     = 0 to 1.0

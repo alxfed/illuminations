@@ -17,7 +17,7 @@ def get_weather(location):
     return {"temperature": "72F", "condition": "Sunny"}
 
 
-def chat_completion(messages=None, instructions=None, tools=None, **kwargs):
+def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
     """A continuation of text with a given context and instruction.
         kwargs:
             temperature     = 0 to 1.0

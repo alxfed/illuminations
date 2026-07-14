@@ -4,8 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "illuminations"
-version = "0.0.22"
+version = "0.0.23"
 authors = [
+    {name="Machina-Ratiocinatrix", email="machina.ratio@gmail.com"},
     {name="Alexander Fedotov", email="alex.fedotov@aol.com"},
 ]
 description = "A package for working with fireworks.ai without dependencies."
