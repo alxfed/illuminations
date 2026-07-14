@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "illuminations"
-version = "0.0.23"
+version = "0.0.24"
 authors = [
     {name="Machina-Ratiocinatrix", email="machina.ratio@gmail.com"},
     {name="Alexander Fedotov", email="alex.fedotov@aol.com"},

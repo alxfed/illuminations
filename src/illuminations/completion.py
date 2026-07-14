@@ -30,7 +30,7 @@ def complete(text, **kwargs):
         "response_format":  kwargs.get('response_format', {'type': 'text'}),
         "reasoning_effort": kwargs.get("reasoning_effort", "high"),
         "reasoning_history":kwargs.get("reasoning_history", "interleaved"),
-        "thinking":         kwargs.get("thinking", {"type": "enabled"}),
+        "thinking":         kwargs.get("thinking", None),
         "max_tokens":       kwargs.get("max_tokens", 5),
         "n":                kwargs.get("n", 1),
         "stop":             kwargs.get("stop_sequences", ["stop"]),
