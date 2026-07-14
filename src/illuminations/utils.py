@@ -76,7 +76,7 @@ def query(payload, url_suffix):
     data_bytes = json.dumps(payload).encode('utf-8')
     # Create the Request object
     req = urllib.request.Request(
-        f'{api_base}/chat/completions',
+        f'{api_base}{url_suffix}',
         data=data_bytes,
         headers=headers,
         method="POST")
