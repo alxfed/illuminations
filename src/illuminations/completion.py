@@ -5,7 +5,8 @@
 This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
-from illuminations import utils
+from .utils import (default_model,
+                    query)
 
 
 def completion(text, **kwargs):
@@ -24,7 +25,7 @@ def completion(text, **kwargs):
     """
     responses = []
     payload = {
-        "model":            kwargs.get("model", utils.default_model),
+        "model":            kwargs.get("model", default_model),
         "prompt":           kwargs.get("prompt", text),
         "response_format":  kwargs.get('response_format', {'type': 'text'}),
         "reasoning_effort": kwargs.get("reasoning_effort", "high"),
@@ -46,7 +47,7 @@ def completion(text, **kwargs):
         # "user":             kwargs.get("user", None)
     }
 
-    responses = utils.query(payload, '/completions')
+    responses = query(payload, '/completions')
 
     return responses
 

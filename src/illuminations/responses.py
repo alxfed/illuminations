@@ -5,7 +5,12 @@
 This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
-from illuminations import utils
+from .utils import (query,
+                    default_model,
+                    get_function,
+                    get_func_args,
+                    call_function,
+                    decode_output)
 
 
 def get_weather(location):
@@ -21,7 +26,7 @@ def respond(messages=None, instructions=None, tools=None, **kwargs):
 
     # Define the initial payload
     payload = {
-        "model":            kwargs.get("model", utils.default_model),
+        "model":            kwargs.get("model", default_model),
         "instructions":     instruction,
         "input":            messages,
         "previous_response_id": kwargs.get("previous_response_id", None),
@@ -42,10 +47,10 @@ def respond(messages=None, instructions=None, tools=None, **kwargs):
 
     while True:
         # Query the API
-        result = utils.query(payload, '/responses')
+        result = query(payload, '/responses')
         # id of the response
         response_id = result['id']
-        thoughts, text, function_calls = utils.decode_output(result.get('output', {}))
+        thoughts, text, function_calls = decode_output(result.get('output', {}))
 
         if function_calls:
             function_outputs_messages = []
@@ -54,9 +59,9 @@ def respond(messages=None, instructions=None, tools=None, **kwargs):
                 func_name = function_call.get('name')
 
                 # Look up tool by name in globals and in caller frames
-                func = utils.get_function(func_name)
-                func_args = utils.get_func_args(function_call)
-                result = utils.call_function(func, func_args)
+                func = get_function(func_name)
+                func_args = get_func_args(function_call)
+                result = call_function(func, func_args)
 
                 tool_message = {
                     "type": "function_call_output",

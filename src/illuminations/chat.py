@@ -5,7 +5,11 @@
 This source code is licensed under the license found in the
 LICENSE file in the root directory of this source tree.
 """
-from illuminations import utils
+from .utils import (query,
+                    default_model,
+                    get_function,
+                    get_func_args,
+                    call_function)
 
 
 def get_weather(location):
@@ -34,7 +38,7 @@ def chat_completion(messages=None, instructions=None, tools=None, **kwargs):
     instruction_and_contents = first_message
 
     payload = {
-        'model':                    kwargs.get('model', utils.default_model),
+        'model':                    kwargs.get('model', default_model),
         'messages':                 instruction_and_contents,
         # 'response_format':          kwargs.get('response_format',{'type': 'text'}),
         'temperature':              kwargs.get('temperature', 1),  # 0.0 to 2.0
@@ -53,7 +57,7 @@ def chat_completion(messages=None, instructions=None, tools=None, **kwargs):
         payload['tool_choice'] = 'auto'
 
     while True:
-        result = utils.query(payload, '/chat/completions')
+        result = query(payload, '/chat/completions')
         completion_message = result['choices'][0]['message']
         instruction_and_contents.append(completion_message)
         thoughts = completion_message.get('reasoning_content', '')
@@ -68,9 +72,9 @@ def chat_completion(messages=None, instructions=None, tools=None, **kwargs):
                 func_name = func_def.get('name', '')
 
                 # Look up tool by name in globals and caller frames
-                func = utils.get_function(func_name)
-                func_args = utils.get_func_args(func_def)
-                result = utils.call_function(func, func_args)
+                func = get_function(func_name)
+                func_args = get_func_args(func_def)
+                result = call_function(func, func_args)
 
                 tool_message = {
                     "role": "tool",
