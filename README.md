@@ -32,7 +32,7 @@ kwargs = """  # this is a string in YAML format
     disable_parallel_tool_use: false
 """
 
-instruction = 'You are a helpful assistant. Important: Do not use markdown or lists in your responses.'
+instruction = 'You are a helpful assistant.Do not use markdown or lists in your responses.'
 
 get_weather_tool_str = """ # YAML definition of a function
     name: get_weather
@@ -60,6 +60,7 @@ thoughts, text = message(
 )
 ```
 or
+
 ```Python
 from yaml import safe_load as yl
 from illuminations.chat import chat_complete as cc
@@ -105,5 +106,47 @@ thoughts, text = cc(
 )
 ```
 or
+
 ```Python
+from yaml import safe_load as yl
+from illuminations.responses import respond
+
+
+kwargs = """  # this is a string in YAML format
+  model: accounts/fireworks/models/glm-5p2
+  max_tokens:   64000
+  temperature:  1.0
+"""
+
+msgs = [{'role': 'user', 'content': 'What is the weather in Chicago, IL and Paris, France?'}]
+
+weather_tool = """ # YAML definition of a function (new format)
+  type: function
+  name: get_weather
+  description: Determine weather in a location
+  parameters:
+    type: object
+    properties:
+      location:
+        type: string
+        description: The city and state, e.g. San Francisco, CA
+    additionalProperties: false
+    required:
+      - location
+"""
+
+tools = [yl(weather_tool)]
+
+instructions = """
+You are a helpful assistant.
+Rubric: respond in plain text without any markdown, emphasis or lists;
+all paragraphs except the first one should begin with a newline and a tab.
+"""
+
+thougts, text = respond(
+    messages=msgs,
+    instructions=instructions,
+    tools=tools,
+    **yl(kwargs)
+)
 ```
