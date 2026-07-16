@@ -39,9 +39,8 @@ def get_function(func_name):
     return func
 
 
-def get_func_args(func_def):
+def get_func_args(func_args_str):
     try:
-        func_args_str = func_def.get('arguments')
         if isinstance(func_args_str, str):
             func_args = json.loads(func_args_str)
         else:
@@ -113,3 +112,19 @@ def decode_output(output):
     function_calls = [part for part in output if part['type'] == 'function_call']
     return thoughts, text, function_calls
 
+
+def decode(output):
+    text = ''
+    thoughts = ''
+    for chunk in output:
+        chunk_type = chunk.get('type', '')
+        if chunk_type == 'text':
+            addition = chunk.get('text', '')
+            if addition not in ('\n\n', '\n'):
+                text += addition
+
+        elif chunk_type == 'thinking':
+            thoughts += chunk.get('thinking', '')
+    function_calls = [part for part in output if part['type'] == 'tool_use']
+
+    return thoughts, text, function_calls

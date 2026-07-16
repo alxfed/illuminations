@@ -70,10 +70,10 @@ def chat_complete(messages=None, instructions=None, tools=None, **kwargs):
                 call_id = function_call.get('id')
                 func_def = function_call.get('function')
                 func_name = func_def.get('name', '')
-
+                func_args_str = func_def.get('arguments')
                 # Look up tool by name in globals and caller frames
                 func = get_function(func_name)
-                func_args = get_func_args(func_def)
+                func_args = get_func_args(func_args_str)
                 result = call_function(func, func_args)
 
                 tool_message = {
